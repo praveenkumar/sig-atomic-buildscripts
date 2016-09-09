@@ -1,5 +1,5 @@
 {
-    "comment": "CentOS adaptation of RHEL Atomic host",
+    "comment": "Custom build based on CentOS Atomic Host",
 
     "osname": "centos-atomic-host",
     "ref": "centos-atomic-host/7/x86_64/standard",
