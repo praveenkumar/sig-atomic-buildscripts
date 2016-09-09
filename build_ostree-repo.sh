@@ -54,7 +54,9 @@ fi
 ## compose a new tree, based on defs in centos-atomic-host.json
 
 rpm-ostree compose --repo=${OstreeRepoDir} tree --add-metadata-string=version=${VERSION} ${GitDir}/centos-atomic-host.json |& tee ${BuildDir}/log.compose
-ostree --repo=${OstreeRepoDir} static-delta generate centos-atomic-host/7/x86_64/standard
+if ostree --repo=${OstreeRepoDir} rev-parse centos-atomic-host/7/x86_64/standard^ &>/dev/null; then
+    ostree --repo=${OstreeRepoDir} static-delta generate centos-atomic-host/7/x86_64/standard
+fi
 ostree --repo=${OstreeRepoDir} summary -u |& tee ${BuildDir}/log.compose
 
 # deal with https://bugzilla.gnome.org/show_bug.cgi?id=748959
