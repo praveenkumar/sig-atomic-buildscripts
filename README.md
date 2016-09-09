@@ -4,38 +4,39 @@ This contains metadata and build scripts for the CentOS Atomic Host
 Images.  For more information, see
 http://wiki.centos.org/SpecialInterestGroup/Atomic
 
-### Maintaining the RPMs
+This branch contains a few scripts and metadata to get you started
+building your own Atomic Host repo, and images.
 
-Owner: `mailto:Colin Walters <walters@verbum.org>`
+### Doing a custom build
 
-The RPM packages are maintained in a combination of the virt7-testing
-and atomic7-testing rpmpkg repositories.  Currently with the CBS,
-there is no dist-git; the information about where the spec files are
-maintained is not known.
+Clone this repo, checkout the 'custombuild' branch.
+- edit the custom-atomic-host.json file to meet your requirements
+- edit the atomic-7.1-cloud.ks to suite your requirements for a cloud
+  image
+- edit the atomic-7.1-vagrant.ks file to suite your vagrant box
+  requirements
 
-But for most of the RPMs maintained in `atomic7-testing`, they're
-built either from the Fedora rawhide dist-git (ostree/rpm-ostree), or
-from the Feodra epel7 dist-git (hawkey/librepo/libsolv).
+run the build_ostree-repo.sh script, eg: 
+  bash build_ostree-repo.sh /srv
 
-### The build process
+once done, in /srv/repo you should have the ostree repo. At this point
+you can run the build_stage2.sh script to get the delivery media. By
+detault this is setup to build cloud image, vagrant images and an 
+installer iso file - most people will want to edit this script to only
+produce the format they need. 
 
-Builds are run every 12 hrs from cron. 
+As a first effort, its recommended the entire set be produced and work
+back from there. To run this script :
+  bash build_stage2.sh /srv
 
-As step-1, the machine is updated to consume the latest content from 
-CentOS Linux, Atomic SIG testing, Virt SIG testing.
+This script uses libvirt and docker on the CentOS Linux 7 machine, so its
+best run either on bare metal with virt capabilities, or in a VM with 
+nested virt.
 
-Then a script is run to generate the artifacts and sent to a push server
-this is the build_ostree_components.sh script.
-
-Resulting artifacts are delivered to :
- * http://buildlogs.centos.org/centos/7/atomic/x86_64/repo/
- * http://buildlogs.centos.org/centos/7/atomic/x86_64/Builds/
-
-Currently this process is owned by Karanbir Singh.
+Typically, expect to consume about 2 to 3 GB of total data space, and
+expect the process to run end to end in about 20 minutes.
 
 ### Contributing
 
 Discuss on http://lists.centos.org/pipermail/centos-devel/
-
-
 
