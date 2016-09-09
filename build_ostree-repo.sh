@@ -22,17 +22,14 @@ LogFile=${BuildDir}/log
 mkdir -p ${BuildDir}
 # Make it absolute
 BuildDir=$(cd $BuildDir && pwd)
-GitDir=${BuildDir}/sig-atomic-buildscripts
-OstreeRepoDir=/srv/repo && mkdir -p $OstreeRepoDir
+GitDir=$(PWD)
+OstreeRepoDir=/${BuildDir}/repo && mkdir -p $OstreeRepoDir
 ln -s ${OstreeRepoDir} ${BuildDir}/repo
 
 set -x
 set -e
 set -o pipefail
 
-## update script from git, commented out for now
-cd ${BuildDir}
-git clone https://github.com/CentOS/sig-atomic-buildscripts && cd sig-atomic-buildscripts && git checkout downstream
 cd ${BuildDir}
 
 # Init, make sure we have the bits we need installed. 
@@ -45,22 +42,14 @@ yum --enablerepo=atomic7-testing -y install rpm-ostree-toolbox
 
 service firewalld stop
 
-
-## backup the last built repo, commented out for now
-
-#  XXX: We need to only retain the last 14 builds or so, Todo, add a find + rm for older tree's
-#/bin/rsync -Ha --stats /srv/rolling/ /srv/rolling.${DateStamp} > ${LogFile} 2>&1
-#echo '----------' >> ${LogFile}
-
 ## create repo in BuildDir, this will fail w/o issue if already exists
 
 if ! test -d ${BuildDir}/repo/objects; then
     ostree --repo=${BuildDir}/repo init --mode=archive-z2
 fi
 
-# sync repo from ds location
-
-ostree remote add --repo=/srv/repo centos-atomic-host --set=gpg-verify=false http://mirror.centos.org/centos/7/atomic/x86_64/repo && ostree pull --depth=-1 --repo=/srv/repo --mirror centos-atomic-host centos-atomic-host/7/x86_64/standard
+# sync repo from ds location : enable this if you want to build on top of the Official CentOS Atomic Host Tree - most people will NOT want this.
+#ostree remote add --repo=/${BuildDir}/repo centos-atomic-host --set=gpg-verify=false http://mirror.centos.org/centos/7/atomic/x86_64/repo && ostree pull --depth=-1 --repo=/${BuildDir}/repo --mirror centos-atomic-host centos-atomic-host/7/x86_64/standard
 
 ## compose a new tree, based on defs in centos-atomic-host.json
 
@@ -69,8 +58,7 @@ ostree --repo=${OstreeRepoDir} static-delta generate centos-atomic-host/7/x86_64
 ostree --repo=${OstreeRepoDir} summary -u |& tee ${BuildDir}/log.compose
 
 # deal with https://bugzilla.gnome.org/show_bug.cgi?id=748959
+chmod -R a+r /${BuildDir}/repo/objects
 
-chmod -R a+r /srv/repo/objects
-
-echo 'Stage-1 done, you can now sign the repo, or just run stage2 '
+echo 'Stage-1 done, you can now build the delivery images from build_stage2.sh'
 
