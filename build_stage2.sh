@@ -3,13 +3,13 @@
 VERSION=7.$( date  +%Y%m%d )
 
 DateStamp=$( date  +%Y%m%d_%H%M%S )
+GitDir=$(pwd)
 BuildDir=$1
 LogFile=${BuildDir}/log
 mkdir -p ${BuildDir}
 # Make it absolute
 BuildDir=$(cd $BuildDir && pwd)
-GitDir=${BuildDir}/sig-atomic-buildscripts
-OstreeRepoDir=/srv/repo && mkdir -p $OstreeRepoDir
+OstreeRepoDir=/${BuildDir}/repo && mkdir -p $OstreeRepoDir
 ln -s ${OstreeRepoDir} ${BuildDir}/repo
 
 set -x
