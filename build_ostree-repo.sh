@@ -22,7 +22,7 @@ LogFile=${BuildDir}/log
 mkdir -p ${BuildDir}
 # Make it absolute
 BuildDir=$(cd $BuildDir && pwd)
-GitDir=$(PWD)
+GitDir=$(pwd)
 OstreeRepoDir=/${BuildDir}/repo && mkdir -p $OstreeRepoDir
 ln -s ${OstreeRepoDir} ${BuildDir}/repo
 
