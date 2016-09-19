@@ -126,5 +126,11 @@ EOKEYS
 chmod 600 ~vagrant/.ssh/authorized_keys
 chown -R vagrant:vagrant ~vagrant/.ssh/
 
+# update docker.service file to exec the certificate generation script
+sed -i.back 's/ExecStart=/ExecStartPre=\/usr\/lib\/opt\/adb\/cert-gen.sh\n&/' /usr/lib/systemd/system/docker.service
+
+# update the docker config to listen on TCP as well as unix socket
+sed -i.back '/OPTIONS=*/c\OPTIONS="--selinux-enabled -H tcp://0.0.0.0:2376 -H unix:///var/run/docker.sock --tlscacert=/etc/docker/ca.pem --tlscert=/etc/docker/server-cert.pem --tlskey=/etc/docker/server-key.pem --tlsverify"' /etc/sysconfig/docker
+
 %end
 
